@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -22,6 +23,7 @@ import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,11 +34,13 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import booksinfo.composeapp.generated.resources.Res
 import booksinfo.composeapp.generated.resources.favorites
+import booksinfo.composeapp.generated.resources.no_favourite_saved
 import booksinfo.composeapp.generated.resources.no_search_results
 import booksinfo.composeapp.generated.resources.search_results
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import ru.zhogin.book.domain.Book
+import ru.zhogin.book.presentation.book_list.components.BookList
 import ru.zhogin.book.presentation.book_list.components.BookSearchBar
 import ru.zhogin.core.presentation.DarkBlue
 import ru.zhogin.core.presentation.DesertWhite
@@ -69,6 +73,22 @@ fun BookListScreen(
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
     val pagerState = rememberPagerState { 2 }
+
+    val searchResultsListState = rememberLazyListState()
+    val favoriteBooksListState = rememberLazyListState()
+
+    LaunchedEffect(state.searchResults) {
+        searchResultsListState.animateScrollToItem(0)
+    }
+
+    LaunchedEffect(state.selectedTabIndex) {
+        pagerState.animateScrollToPage(state.selectedTabIndex)
+    }
+
+    LaunchedEffect(pagerState.currentPage) {
+        onAction(BookListAction.OnTabSelected(pagerState.currentPage))
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -127,7 +147,7 @@ fun BookListScreen(
                         unselectedContentColor = Color.Black.copy(
                             alpha = 0.5f
                         )
-                    ){
+                    ) {
                         Text(
                             text = stringResource(Res.string.search_results),
                             modifier = Modifier
@@ -144,7 +164,7 @@ fun BookListScreen(
                         unselectedContentColor = Color.Black.copy(
                             alpha = 0.5f
                         )
-                    ){
+                    ) {
                         Text(
                             text = stringResource(Res.string.favorites),
                             modifier = Modifier
@@ -164,7 +184,7 @@ fun BookListScreen(
                             .fillMaxSize(),
                         contentAlignment = Alignment.Center
                     ) {
-                        when(pageIndex) {
+                        when (pageIndex) {
                             0 -> {
                                 if (state.isLoading) {
                                     CircularProgressIndicator()
@@ -178,19 +198,46 @@ fun BookListScreen(
                                                 color = MaterialTheme.colorScheme.error,
                                             )
                                         }
+
                                         state.searchResults.isEmpty() -> {
                                             Text(
-                                                text = Res.string.no_search_results,
+                                                text = stringResource(Res.string.no_search_results),
                                                 textAlign = TextAlign.Center,
                                                 style = MaterialTheme.typography.headlineSmall,
-                                                color = MaterialTheme.colorScheme.error,
+                                            )
+                                        }
+
+                                        else -> {
+                                            BookList(
+                                                books = state.searchResults,
+                                                onBookClick = {
+                                                    onAction(BookListAction.OnBookClick(it))
+                                                },
+                                                modifier = Modifier.fillMaxSize(),
+                                                scrollState = searchResultsListState,
                                             )
                                         }
                                     }
                                 }
                             }
-                            1 -> {
 
+                            1 -> {
+                                if (state.favouriteBooks.isEmpty()) {
+                                    Text(
+                                        text = stringResource(Res.string.no_favourite_saved),
+                                        textAlign = TextAlign.Center,
+                                        style = MaterialTheme.typography.headlineSmall,
+                                    )
+                                } else {
+                                    BookList(
+                                        books = state.favouriteBooks,
+                                        onBookClick = {
+                                            onAction(BookListAction.OnBookClick(it))
+                                        },
+                                        modifier = Modifier.fillMaxSize(),
+                                        scrollState = favoriteBooksListState,
+                                    )
+                                }
                             }
                         }
                     }
