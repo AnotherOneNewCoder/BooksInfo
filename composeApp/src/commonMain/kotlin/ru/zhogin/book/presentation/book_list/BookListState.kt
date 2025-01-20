@@ -5,14 +5,15 @@ import ru.zhogin.core.presentation.UiText
 
 data class BookListState(
     val searchQuery: String = "Kotlin",
- //   val searchResults: List<Book> = emptyList(),
-    val searchResults: List<Book> = books,
+    val searchResults: List<Book> = emptyList(),
+    // in order to test UI
+    //val searchResults: List<Book> = books,
     val favouriteBooks: List<Book> = emptyList(),
-    val isLoading: Boolean = false,
+    val isLoading: Boolean = true,
     val selectedTabIndex: Int = 0,
     val errorMessage: UiText? = null,
 )
-
+// in order to test UI
 private val books = (1..100).map {
     Book(
         id = it.toString(),

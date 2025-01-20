@@ -1,6 +1,6 @@
 package ru.zhogin.book.data.repository
 
-import ru.zhogin.book.data.mapprs.toBook
+import ru.zhogin.book.data.mappers.toBook
 import ru.zhogin.book.data.network.RemoteBookDataSource
 import ru.zhogin.book.domain.Book
 import ru.zhogin.book.domain.BookRepository
