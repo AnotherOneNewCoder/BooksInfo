@@ -9,6 +9,8 @@ import ru.zhogin.book.data.network.KtorRemoteBookDataSource
 import ru.zhogin.book.data.network.RemoteBookDataSource
 import ru.zhogin.book.data.repository.DefaultBookRepository
 import ru.zhogin.book.domain.BookRepository
+import ru.zhogin.book.presentation.SelectedBookViewModel
+import ru.zhogin.book.presentation.book_detail.BookDetailViewModel
 import ru.zhogin.book.presentation.book_list.BookListViewModel
 import ru.zhogin.core.data.HttpClientFactory
 
@@ -22,4 +24,6 @@ val sharedModule = module {
     singleOf(::DefaultBookRepository).bind<BookRepository>()
 
     viewModelOf(::BookListViewModel)
+    viewModelOf(::BookDetailViewModel)
+    viewModelOf(::SelectedBookViewModel)
 }
