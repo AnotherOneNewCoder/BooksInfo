@@ -1,10 +1,13 @@
 package ru.zhogin.di
 
+import androidx.sqlite.driver.bundled.BundledSQLiteDriver
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.bind
 import org.koin.dsl.module
+import ru.zhogin.book.data.database.DatabaseFactory
+import ru.zhogin.book.data.database.FavoriteBookDatabase
 import ru.zhogin.book.data.network.KtorRemoteBookDataSource
 import ru.zhogin.book.data.network.RemoteBookDataSource
 import ru.zhogin.book.data.repository.DefaultBookRepository
@@ -22,6 +25,13 @@ val sharedModule = module {
     }
     singleOf(::KtorRemoteBookDataSource).bind<RemoteBookDataSource>()
     singleOf(::DefaultBookRepository).bind<BookRepository>()
+
+    single {
+        get<DatabaseFactory>().create()
+            .setDriver(BundledSQLiteDriver())
+            .build()
+    }
+    single { get<FavoriteBookDatabase>().favoriteBookDao }
 
     viewModelOf(::BookListViewModel)
     viewModelOf(::BookDetailViewModel)
