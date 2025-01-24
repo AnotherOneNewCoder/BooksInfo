@@ -1,16 +1,18 @@
 package ru.zhogin.book.data.database
 
+import androidx.room.ConstructedBy
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 
 @Database(
     entities = [BookEntity::class],
-    version = 1
+    version = 2
 )
 @TypeConverters(
     StringListTypeConverter::class
 )
+@ConstructedBy(BookDatabaseConstructor::class)
 abstract class FavoriteBookDatabase: RoomDatabase() {
     abstract val favoriteBookDao: FavoriteBookDao
 
